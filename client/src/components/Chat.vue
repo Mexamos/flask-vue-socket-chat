@@ -36,31 +36,35 @@ export default {
     }
   },
   created () {
-  //   this.socket = io('localhost:5000')
+    this.socket = io('localhost:5000')
 
-  //   this.socket.on('chat_message', function (data) {
-  //     this.messages.push(data)
-  //   }.bind(this))
-  // },
-  // mounted () {
-  //   document.body.addEventListener('keypress', function (event) {
-  //     if(event.keyCode === 13 && this.sendMessage) {
-  //       this.sendMessage()
-  //     }
-  //   }.bind(this))
-  //   window.addEventListener('beforeunload', function () {
-  //     this.socket.close()
-  //   }.bind(this))
-  // },
-  // methods: {
-  //   sendMessage () {
-  //     this.socket.emit('message', {
-  //       id: this.socket.id,
-  //       text: this.new_message
-  //     })
-  //     this.new_message = ''
-  //   },
-  //   addUser () {
+    this.socket.on('chat_message', function (data) {
+      this.messages.push(data)
+    }.bind(this))
+    this.socket.on('update_user_list', function (users) {
+      console.log('users', users)
+      // this.users = users
+    }.bind(this))
+  },
+  mounted () {
+    document.body.addEventListener('keypress', function (event) {
+      if(event.keyCode === 13 && this.sendMessage) {
+        this.sendMessage()
+      }
+    }.bind(this))
+    window.addEventListener('beforeunload', function () {
+      this.socket.close()
+    }.bind(this))
+  },
+  methods: {
+    sendMessage () {
+      this.socket.emit('message', {
+        id: this.socket.id,
+        text: this.new_message
+      })
+      this.new_message = ''
+    },
+    addUser () {
 
     },
     getRandomColor () {
