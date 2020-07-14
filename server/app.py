@@ -12,7 +12,7 @@ CORS(app, resources={
 app.config['SECRET_KEY'] = 'secret key'
 sio = SocketIO(app, cors_allowed_origins="*")
 
-clients_ids = []
+clients = []
 clients_unique_colors = []
 
 def generate_hex_color():
@@ -23,8 +23,6 @@ def generate_hex_color():
 
 @sio.on('connect')
 def connect():
-    print('connected request.sid', request.sid)
-
     color = generate_hex_color()
     while color in clients_unique_colors:
         color = generate_hex_color()
@@ -35,23 +33,27 @@ def connect():
       'color': color
     }
 
-    clients_ids.append(client)
-    sio.emit('update_user_list', clients_ids)
-    print('clients_ids', clients_ids)
+    clients.append(client)
+    sio.emit('update_user_list', clients)
 
 
 @sio.on('message')
 def message(data):
-    print('data', data)
     sio.emit('chat_message', data)
 
 
 @sio.on('disconnect')
 def disconnect():
-    print('disconnect', request.sid)
-    global clients_ids
-    clients_ids = list(filter(lambda client: client['id'] is not request.sid, clients_ids))
-    sio.emit('update_user_list', clients_ids)
+    global clients
+    clients = list(filter(lambda client: str(client['id']) != str(request.sid), clients))
+    sio.emit('update_user_list', clients)
+
+
+@sio.on('update_user')
+def message(user):
+    global clients
+    clients = list(map(lambda client: user if client['id'] == user['id'] else client, clients))
+    sio.emit('update_user_list', clients)
 
 
 if __name__ == '__main__':
