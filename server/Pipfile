@@ -10,6 +10,8 @@ flask = "*"
 flask-socketio = "*"
 flask-cors = "*"
 uwsgi = "*"
+gevent = "*"
+eventlet = "*"
 
 [requires]
 python_version = "3.7"

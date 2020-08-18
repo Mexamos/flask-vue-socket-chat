@@ -10,7 +10,7 @@ CORS(app, resources={
     }
 })
 app.config['SECRET_KEY'] = 'secret key'
-sio = SocketIO(app, cors_allowed_origins="*")
+sio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 clients = []
 clients_unique_colors = []
