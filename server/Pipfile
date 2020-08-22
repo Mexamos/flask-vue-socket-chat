@@ -7,11 +7,10 @@ verify_ssl = true
 
 [packages]
 flask = "*"
-flask-socketio = "*"
 flask-cors = "*"
 uwsgi = "*"
-gevent = "*"
-eventlet = "*"
+python-socketio = "*"
+gevent-websocket = "*"
 
 [requires]
 python_version = "3.7"

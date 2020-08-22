@@ -1,16 +1,10 @@
+import socketio
 import random
-from flask import Flask, request
-from flask_cors import CORS
-from flask_socketio import SocketIO
 
-app = Flask(__name__)
-CORS(app, resources={
-    r"/*": {
-        "origins": "*"
-    }
-})
-app.config['SECRET_KEY'] = 'secret key'
-sio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+from gevent import pywsgi
+
+sio = socketio.Server(cors_allowed_origins="*", async_mode='gevent_uwsgi')
+app = socketio.WSGIApp(sio)
 
 clients = []
 clients_unique_colors = []
@@ -22,14 +16,14 @@ def generate_hex_color():
     return hex_color
 
 @sio.on('connect')
-def connect():
+def connect(sid, environ):
     color = generate_hex_color()
     while color in clients_unique_colors:
         color = generate_hex_color()
     clients_unique_colors.append(color)
 
     client = {
-      'id': request.sid,
+      'id': sid,
       'color': color
     }
 
@@ -38,24 +32,23 @@ def connect():
 
 
 @sio.on('message')
-def message(data):
+def message(sid, data):
     sio.emit('chat_message', data)
 
 
 @sio.on('disconnect')
-def disconnect():
+def disconnect(sid):
     global clients
-    clients = list(filter(lambda client: str(client['id']) != str(request.sid), clients))
+    clients = list(filter(lambda client: str(client['id']) != str(sid), clients))
     sio.emit('update_user_list', clients)
 
 
 @sio.on('update_user')
-def message(user):
+def update_user(sid, user):
     global clients
     clients = list(map(lambda client: user if client['id'] == user['id'] else client, clients))
     sio.emit('update_user_list', clients)
 
 
 if __name__ == '__main__':
-    app.debug = True
-    sio.run(app)
+    pywsgi.WSGIServer(('', 5000), app).serve_forever()
