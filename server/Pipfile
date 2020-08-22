@@ -6,8 +6,6 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-flask = "*"
-flask-cors = "*"
 uwsgi = "*"
 python-socketio = "*"
 gevent-websocket = "*"
@@ -16,4 +14,4 @@ gevent-websocket = "*"
 python_version = "3.7"
 
 [scripts]
-dev = "python app.py"
+dev = "uwsgi uwsgi.ini"
